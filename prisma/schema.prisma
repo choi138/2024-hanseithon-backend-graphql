@@ -1,0 +1,118 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          String      @id @default(uuid())
+  email       String      @unique @db.VarChar(255)
+  password    String      @db.VarChar(255)
+  name        String      @db.VarChar(4)
+  role        UserRole    @default(GUEST)
+  profileUrl  String?     @map("profile_url") @db.VarChar(255)
+  createdAt   DateTime    @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime    @default(now()) @map("updated_at") @db.Timestamp(6)
+  lastLoginAt DateTime?   @map("last_login_at") @db.Timestamp(6)
+  lastLoginIp String?     @map("last_login_ip") @db.VarChar(255)
+  student     Student?
+  teamMember  TeamMember?
+  files       File[]
+}
+
+model Student {
+  id         String            @id @default(uuid())
+  department StudentDepartment
+  grade      Int
+  classroom  Int
+  number     Int
+  userId     String            @unique @map("user_id")
+  user       User              @relation(fields: [userId], references: [id])
+}
+
+model Team {
+  id          String       @id @default(uuid())
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamp(6)
+  updatedAt   DateTime     @default(now()) @map("updated_at") @db.Timestamp(6)
+  type        TeamType
+  name        String       @unique @db.VarChar(30)
+  description String?
+  inviteCode  String?      @unique @map("invite_code") @db.VarChar(6)
+  member      TeamMember[]
+  logs        TeamLog[]
+  files       TeamFile[]
+}
+
+model TeamMember {
+  id       Int                @id @default(autoincrement())
+  createAt DateTime           @default(now()) @map("created_at") @db.Timestamp(6)
+  isLeader Boolean            @default(false) @map("is_leader")
+  teamId   String             @map("team_id")
+  userId   String             @unique @map("user_id")
+  position TeamMemberPosition
+  team     Team               @relation(fields: [teamId], references: [id], onDelete: Restrict)
+  user     User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model TeamLog {
+  id         String      @id @default(uuid())
+  type       TeamLogType
+  teamId     String?     @map("team_id")
+  team       Team?       @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  memberName String      @map("member_name")
+  actionAt   DateTime    @default(now()) @map("action_at") @db.Timestamp(6)
+}
+
+model TeamFile {
+  id     Int    @id @default(autoincrement())
+  teamId String @map("team_id")
+  team   Team   @relation(fields: [teamId], references: [id])
+  file   File   @relation(fields: [fileId], references: [id])
+  fileId String @unique @map("file_id")
+}
+
+model File {
+  id         String    @id @default(uuid())
+  name       String    @db.Text
+  location   String    @db.Text
+  key        String    @db.Text
+  size       BigInt
+  uploaderId String?   @map("uploader_id")
+  uploader   User?     @relation(fields: [uploaderId], references: [id], onDelete: SetNull)
+  uploadAt   DateTime  @default(now()) @map("upload_at") @db.Timestamp(6)
+  teamFiles  TeamFile?
+}
+
+enum UserRole {
+  GUEST
+  STUDENT
+  ADMIN
+}
+
+enum StudentDepartment {
+  CLOUD
+  META
+  HACKING
+  NETWORK
+  GAME
+}
+
+enum TeamType {
+  LIVING
+  GAME
+}
+
+enum TeamMemberPosition {
+  PM
+  DESIGNER
+  DEVELOPER
+}
+
+enum TeamLogType {
+  TEAM_CREATED
+  TEAM_JOIN
+  TEAM_LEFT
+}
