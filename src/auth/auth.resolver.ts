@@ -1,13 +1,18 @@
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Res, UseGuards } from '@nestjs/common';
+import { Args, Context, GraphQLExecutionContext, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-// import { ClientIp } from 'src/common/decorators';
+import { Request, Response } from 'express';
 
-import { AuthCommonDto } from 'src/common/dto';
+import { ClientIp } from 'src/common/decorators';
 import { UserModel } from 'src/common/models';
 
 import { AuthService } from './auth.service';
-// import { GetUser, UserProfile } from './decorators';
+import { GetUser } from './decorators';
+import { AuthOutputDto } from './dto/auth-output.dto';
+import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
+import { JwtAccessGuard, JwtRefreshGuard } from './guards';
+import { GqlAuthGuard } from './guards/gql-auth.guard';
 
 @Resolver()
 export class AuthResolver {
@@ -21,43 +26,43 @@ export class AuthResolver {
   @Mutation(() => UserModel)
   async signUp(@Args('signUpDto') signUpDto: SignUpDto): Promise<UserModel> {
     return await this.authService.signUp(signUpDto);
-    // return;
   }
 
-  //   @Post('login')
-  //   //   @UseGuards(LocalAuthGuard)
-  //   async signIn(
-  //     @Res({ passthrough: true }) res: Response, // cookie를 설정하기 위해 express의 Response를 사용
-  //     @GetUser() user: UserModel,
-  //     @ClientIp() clientIp: string,
-  //   ) {
-  //     const { accessToken, refreshCookieOption, refreshToken } =
-  //       this.authService.issueLoginTokenSet(user);
-  //     await this.authService.updateLastLoginIp(user.id, clientIp);
+  @Mutation(() => AuthOutputDto)
+  @UseGuards(GqlAuthGuard)
+  async signIn(
+    @Args('signInDto') signInDto: SignInDto,
+    @Context('req') req: Request,
+    @GetUser() user: UserModel,
+    @ClientIp() clientIp: string,
+  ): Promise<AuthOutputDto> {
+    await this.authService.signIn(signInDto);
+    const { accessToken, refreshToken, refreshCookieOption } =
+      this.authService.issueLoginTokenSet(user);
+    await this.authService.updateLastLoginIp(user.id, clientIp);
 
-  //     res.cookie('token', refreshToken, refreshCookieOption);
+    req.res.cookie('token', refreshToken, refreshCookieOption);
+    return { accessToken };
+  }
 
-  //     return { accessToken };
-  //   }
+  @Mutation(() => AuthOutputDto)
+  @UseGuards(JwtRefreshGuard)
+  async silent(
+    @GetUser() user: UserModel,
+    @ClientIp() clientIp: string,
+    @Context('req') req: Request,
+  ): Promise<AuthOutputDto> {
+    const { accessToken, refreshToken, refreshCookieOption } =
+      this.authService.issueLoginTokenSet(user);
+    await this.authService.updateLastLoginIp(user.id, clientIp);
+    req.res.cookie('token', refreshToken, refreshCookieOption);
 
-  //   @Post('silent')
-  //   //   @UseGuards(JwtRefreshGuard)
-  //   async silent(
-  //     @Res({ passthrough: true }) res: Response,
-  //     @GetUser() user: UserProfile,
-  //     @ClientIp() clientIp: string,
-  //   ) {
-  //     const { accessToken, refreshToken, refreshCookieOption } =
-  //       this.authService.issueLoginTokenSet(user);
-  //     await this.authService.updateLastLoginIp(user.id, clientIp);
+    return { accessToken };
+  }
 
-  //     res.cookie('token', refreshToken, refreshCookieOption);
-  //     return { accessToken };
-  //   }
-
-  //   @Get('me')
-  //   //   @UseGuards(JwtAccessGuard)
-  //   async me(@GetUser() user: UserProfile) {
-  //     return this.authService.formatUser(user);
-  //   }
+  @Query(() => UserModel)
+  @UseGuards(JwtAccessGuard)
+  async me(@GetUser() user: UserModel): Promise<UserModel> {
+    return this.authService.formatUser(user);
+  }
 }

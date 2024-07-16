@@ -43,12 +43,21 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+"""로그인 성공 시 반환되는 Payload"""
+type AuthOutputDto {
+  """JWT 인증 토큰"""
+  accessToken: String!
+}
+
 type Query {
   sayHello: String!
+  me: UserModel!
 }
 
 type Mutation {
   signUp(signUpDto: SignUpDto!): UserModel!
+  signIn(signInDto: SignInDto!): AuthOutputDto!
+  silent: AuthOutputDto!
 }
 
 """회원가입 정보"""
@@ -79,4 +88,13 @@ input SignUpStudentDTO {
 
   """번호"""
   number: Float!
+}
+
+"""로그인 정보"""
+input SignInDto {
+  """사용자 아이디"""
+  email: String!
+
+  """사용자 비밀번호"""
+  password: String!
 }

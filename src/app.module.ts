@@ -20,6 +20,7 @@ import { UsersModule } from './users/users.module';
       driver: ApolloDriver,
       playground: true, // Set to false in production. It enables the GraphQL Playground where you can test your queries.
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      context: ({ req, res }) => ({ req, res }),
       formatError: (error) => {
         const originalError = error.extensions?.originalError as Error;
 

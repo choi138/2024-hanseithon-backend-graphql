@@ -1,3 +1,6 @@
+import { InputType } from '@nestjs/graphql';
+
 import { AuthCommonDto } from './auth-common.dto';
 
-export class SingInDto extends AuthCommonDto {}
+@InputType({ description: '로그인 정보' })
+export class SignInDto extends AuthCommonDto {}

@@ -6,11 +6,11 @@ import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 // import { StudentsService } from 'src/students/students.service';
-import { AuthCommonDto } from 'src/common/dto';
+
 import { UserModel } from 'src/common/models';
 import { UsersService } from 'src/users/users.service';
 
-import { SingInDto } from './dto/sign-in.dto';
+import { SignInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
 
 @Injectable()
@@ -50,13 +50,14 @@ export class AuthService {
     return userWithStudent;
   }
 
-  public async signIn({ email, password }: SingInDto) {
+  public async signIn({ email, password }: SignInDto) {
     const { isExist: existUser, user } = await this.usersService.isExistUser(email);
     if (!existUser) throw new UnauthorizedException('이메일/비밀번호를 확인해주세요.');
 
     const isCorrectPassword = await bcrypt.compare(password, user.password);
     if (!isCorrectPassword) throw new UnauthorizedException('이메일/비밀번호를 확인해주세요.');
 
+    delete user.password;
     return user;
   }
 
@@ -78,9 +79,9 @@ export class AuthService {
       accessToken,
       refreshToken,
       refreshCookieOption: {
-        domain: isProduction ? '127.0.0.1' : '127.0.0.1', // 특정 도메인에서만 쿠키를 전송하도록 설정
+        domain: isProduction ? 'localhost' : 'localhost', // 특정 도메인에서만 쿠키를 전송하도록 설정
         maxAge: 60 * 60 * 24 * 1000, // 24시간 후 만료
-        httpOnly: true, // 자바스크립트에서 쿠키에 접근하지 못하도록 설정
+        httpOnly: false, // 자바스크립트에서 쿠키에 접근하지 못하도록 설정
         secure: isProduction, // production이면 https만 허용
       },
     };
