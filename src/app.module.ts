@@ -1,13 +1,14 @@
+import { join } from 'path';
+
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
+import { GraphQLModule } from '@nestjs/graphql';
+
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
-
-import { join } from 'path';
-import { UsersModule } from './users/users.module';
-import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './auth/auth.module';
+import { UsersModule } from './users/users.module';
 
 @Module({
   imports: [
@@ -19,6 +20,20 @@ import { AuthModule } from './auth/auth.module';
       driver: ApolloDriver,
       playground: true, // Set to false in production. It enables the GraphQL Playground where you can test your queries.
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+      formatError: (error) => {
+        const originalError = error.extensions?.originalError as Error;
+
+        if (!originalError) {
+          return {
+            message: error.message,
+            code: error.extensions?.code,
+          };
+        }
+        return {
+          message: originalError.message,
+          code: error.extensions?.code,
+        };
+      },
     }),
     UsersModule,
     AuthModule,

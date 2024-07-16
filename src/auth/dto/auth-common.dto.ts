@@ -1,4 +1,5 @@
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
+import { Field, InputType } from '@nestjs/graphql';
+
 import { IsEmail, IsNotEmpty, IsString, Matches } from 'class-validator';
 
 import { PASSWORD_REGEX } from 'src/common/constant';

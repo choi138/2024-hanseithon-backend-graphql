@@ -1,3 +1,5 @@
+import { Field, InputType } from '@nestjs/graphql';
+
 import { StudentDepartment } from '@prisma/client';
 import { Type } from 'class-transformer';
 import {
@@ -14,7 +16,6 @@ import {
 import { NAME_REGEX } from 'src/common/constant';
 
 import { AuthCommonDto } from './auth-common.dto';
-import { Field, InputType, ObjectType } from '@nestjs/graphql';
 
 @InputType({ description: '학생 정보' })
 class SignUpStudentDTO {

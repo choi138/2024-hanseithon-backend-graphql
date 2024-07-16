@@ -1,31 +1,27 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Res,
-} from '@nestjs/common';
-
-import { Response } from 'express';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 
 // import { ClientIp } from 'src/common/decorators';
+
+import { AuthCommonDto } from 'src/common/dto';
+import { UserModel } from 'src/common/models';
 
 import { AuthService } from './auth.service';
 // import { GetUser, UserProfile } from './decorators';
 import { SignUpDto } from './dto/sign-up.dto';
-import { Args, Mutation, Resolver } from '@nestjs/graphql';
-import { UserModel } from 'src/common/models';
 
 @Resolver()
 export class AuthResolver {
   constructor(private readonly authService: AuthService) {}
 
+  @Query(() => String)
+  sayHello(): string {
+    return 'Hello World!';
+  }
+
   @Mutation(() => UserModel)
   async signUp(@Args('signUpDto') signUpDto: SignUpDto): Promise<UserModel> {
-    await this.authService.signUp(signUpDto);
-    return;
+    return await this.authService.signUp(signUpDto);
+    // return;
   }
 
   //   @Post('login')

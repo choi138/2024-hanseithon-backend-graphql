@@ -1,4 +1,5 @@
 import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
+
 import { UserRole } from '@prisma/client';
 
 registerEnumType(UserRole, { name: 'UserRole' });
@@ -9,8 +10,6 @@ export class UserModel {
   id: string;
   @Field(() => String, { description: '사용자 이메일' })
   email: string;
-  @Field(() => String, { description: '사용자 비밀번호' })
-  password: string;
   @Field(() => String, { description: '사용자 이름' })
   name: string;
   @Field(() => UserRole, { description: '사용자 역할' })

@@ -7,14 +7,76 @@ type UserModel {
   """사용자 아이디"""
   id: String!
 
+  """사용자 이메일"""
+  email: String!
+
   """사용자 이름"""
   name: String!
 
-  """사용자 이메일"""
-  email: String!
+  """사용자 역할"""
+  role: UserRole!
+
+  """사용자 프로필 이미지 URL"""
+  profileUrl: String
+
+  """사용자 생성일"""
+  createdAt: DateTime!
+
+  """사용자 업데이트일"""
+  updatedAt: DateTime!
+
+  """사용자 마지막 로그인 시각"""
+  lastLoginAt: DateTime
+
+  """사용자 마지막 로그인 IP"""
+  lastLoginIp: String
 }
 
+enum UserRole {
+  GUEST
+  STUDENT
+  ADMIN
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
 type Query {
-  """사용자 목록"""
-  findManyUserAll: [UserModel!]!
+  sayHello: String!
+}
+
+type Mutation {
+  signUp(signUpDto: SignUpDto!): UserModel!
+}
+
+"""회원가입 정보"""
+input SignUpDto {
+  """사용자 아이디"""
+  email: String!
+
+  """사용자 비밀번호"""
+  password: String!
+
+  """사용자 이름"""
+  name: String!
+
+  """학생 정보"""
+  student: SignUpStudentDTO!
+}
+
+"""학생 정보"""
+input SignUpStudentDTO {
+  """학과"""
+  department: String!
+
+  """학년"""
+  grade: Float!
+
+  """반"""
+  classroom: Float!
+
+  """번호"""
+  number: Float!
 }

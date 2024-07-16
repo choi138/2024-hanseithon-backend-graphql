@@ -1,8 +1,4 @@
-import {
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 
@@ -10,11 +6,12 @@ import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 // import { StudentsService } from 'src/students/students.service';
+import { AuthCommonDto } from 'src/common/dto';
+import { UserModel } from 'src/common/models';
 import { UsersService } from 'src/users/users.service';
 
 import { SingInDto } from './dto/sign-in.dto';
 import { SignUpDto } from './dto/sign-up.dto';
-import { UserModel } from 'src/common/models';
 
 @Injectable()
 export class AuthService {
@@ -28,11 +25,7 @@ export class AuthService {
     this.bcryptNumber = 10;
   }
 
-  public async signUp({
-    email,
-    password,
-    name,
-  }: SignUpDto): Promise<UserModel> {
+  public async signUp({ email, password, name }: SignUpDto): Promise<UserModel> {
     const { isExist: existUser } = await this.usersService.isExistUser(email);
     if (existUser) throw new ConflictException('이미 존재하는 유저입니다.');
 
@@ -58,14 +51,11 @@ export class AuthService {
   }
 
   public async signIn({ email, password }: SingInDto) {
-    const { isExist: existUser, user } =
-      await this.usersService.isExistUser(email);
-    if (!existUser)
-      throw new UnauthorizedException('이메일/비밀번호를 확인해주세요.');
+    const { isExist: existUser, user } = await this.usersService.isExistUser(email);
+    if (!existUser) throw new UnauthorizedException('이메일/비밀번호를 확인해주세요.');
 
     const isCorrectPassword = await bcrypt.compare(password, user.password);
-    if (!isCorrectPassword)
-      throw new UnauthorizedException('이메일/비밀번호를 확인해주세요.');
+    if (!isCorrectPassword) throw new UnauthorizedException('이메일/비밀번호를 확인해주세요.');
 
     return user;
   }
@@ -80,14 +70,8 @@ export class AuthService {
   }
 
   public issueLoginTokenSet(user: UserModel) {
-    const accessToken = this.issueJwtToken(
-      { sub: user.id, role: user.role },
-      true,
-    );
-    const refreshToken = this.issueJwtToken(
-      { sub: user.id, role: user.role },
-      false,
-    );
+    const accessToken = this.issueJwtToken({ sub: user.id, role: user.role }, true);
+    const refreshToken = this.issueJwtToken({ sub: user.id, role: user.role }, false);
     const isProduction = this.configService.get<string>('NODE_ENV') === 'prod';
 
     return {
@@ -102,10 +86,7 @@ export class AuthService {
     };
   }
 
-  public issueJwtToken(
-    payload: { sub: string; role: string },
-    isAccessToken: boolean,
-  ) {
+  public issueJwtToken(payload: { sub: string; role: string }, isAccessToken: boolean) {
     const accessSecret = this.configService.get<string>('JWT_ACCESS_SECRET');
     const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
 
@@ -118,8 +99,6 @@ export class AuthService {
   }
 
   public formatUser(user: UserModel) {
-    delete user.password;
-
     // if (user.student) {
     //   delete user.student.id;
     //   delete user.student.userId;
