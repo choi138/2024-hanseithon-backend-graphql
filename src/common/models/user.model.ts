@@ -2,6 +2,8 @@ import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 
 import { UserRole } from '@prisma/client';
 
+import { StudentModel } from './student.model';
+
 registerEnumType(UserRole, { name: 'UserRole' });
 
 @ObjectType({ description: '사용자' })
@@ -33,6 +35,9 @@ export class UserModel {
     nullable: true,
   })
   lastLoginIp?: string;
+
+  @Field(() => StudentModel, { description: '학생 정보' })
+  student: StudentModel;
   //   student;
   //   teamMember;
   //   files;

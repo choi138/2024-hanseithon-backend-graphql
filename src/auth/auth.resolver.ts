@@ -1,7 +1,7 @@
-import { Res, UseGuards } from '@nestjs/common';
-import { Args, Context, GraphQLExecutionContext, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { Args, Context, Mutation, Query, Resolver } from '@nestjs/graphql';
 
-import { Request, Response } from 'express';
+import { Request } from 'express';
 
 import { ClientIp } from 'src/common/decorators';
 import { UserModel } from 'src/common/models';

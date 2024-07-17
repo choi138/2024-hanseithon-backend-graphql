@@ -7,7 +7,8 @@ import * as bcrypt from 'bcrypt';
 
 // import { StudentsService } from 'src/students/students.service';
 
-import { UserModel } from 'src/common/models';
+import { StudentModel, UserModel } from 'src/common/models';
+import { StudentsService } from 'src/students/students.service';
 import { UsersService } from 'src/users/users.service';
 
 import { SignInDto } from './dto/sign-in.dto';
@@ -18,23 +19,20 @@ export class AuthService {
   private bcryptNumber: number;
   constructor(
     private readonly usersService: UsersService,
-    // private readonly studentsService: StudentsService,
+    private readonly studentsService: StudentsService,
     private readonly configService: ConfigService,
     private readonly jwtService: JwtService,
   ) {
     this.bcryptNumber = 10;
   }
 
-  public async signUp({ email, password, name }: SignUpDto): Promise<UserModel> {
+  public async signUp({ email, password, name, student }: SignUpDto): Promise<UserModel> {
     const { isExist: existUser } = await this.usersService.isExistUser(email);
     if (existUser) throw new ConflictException('이미 존재하는 유저입니다.');
 
-    // const { isExist: existStudent } =
-    //   await this.studentsService.isExistStudent(student);
-    // if (existStudent)
-    //   throw new ConflictException(
-    //     '이미 가입된 학번이에요. 학생회에 직접 문의해주세요.',
-    //   );
+    const { isExist: existStudent } = await this.studentsService.isExistStudent(student);
+    if (existStudent)
+      throw new ConflictException('이미 가입된 학번이에요. 학생회에 직접 문의해주세요.');
 
     const hashedPassword = await bcrypt.hash(password, this.bcryptNumber);
     const user = await this.usersService.createUser({
@@ -43,7 +41,7 @@ export class AuthService {
       name,
     });
 
-    // await this.studentsService.createStudent(user.id, student);
+    await this.studentsService.createStudent(user.id, student);
 
     const { user: userWithStudent } = await this.usersService.findById(user.id);
 
@@ -81,7 +79,7 @@ export class AuthService {
       refreshCookieOption: {
         domain: isProduction ? 'localhost' : 'localhost', // 특정 도메인에서만 쿠키를 전송하도록 설정
         maxAge: 60 * 60 * 24 * 1000, // 24시간 후 만료
-        httpOnly: false, // 자바스크립트에서 쿠키에 접근하지 못하도록 설정
+        httpOnly: true, // 자바스크립트에서 쿠키에 접근하지 못하도록 설정
         secure: isProduction, // production이면 https만 허용
       },
     };
@@ -100,10 +98,10 @@ export class AuthService {
   }
 
   public formatUser(user: UserModel) {
-    // if (user.student) {
-    //   delete user.student.id;
-    //   delete user.student.userId;
-    // }
+    if (user.student) {
+      delete user.student.id;
+      delete user.student.userId;
+    }
 
     // if (user.teamMember) {
     //   delete user.teamMember.id;

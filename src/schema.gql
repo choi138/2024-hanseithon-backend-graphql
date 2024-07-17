@@ -2,6 +2,35 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+"""학생"""
+type StudentModel {
+  """학생 id"""
+  id: String!
+
+  """학과"""
+  department: StudentDepartment!
+
+  """학년"""
+  grade: Float!
+
+  """반"""
+  classroom: Float!
+
+  """번호"""
+  number: Float!
+
+  """학생 id"""
+  userId: String!
+}
+
+enum StudentDepartment {
+  CLOUD
+  META
+  HACKING
+  NETWORK
+  GAME
+}
+
 """사용자"""
 type UserModel {
   """사용자 아이디"""
@@ -30,6 +59,9 @@ type UserModel {
 
   """사용자 마지막 로그인 IP"""
   lastLoginIp: String
+
+  """학생 정보"""
+  student: StudentModel!
 }
 
 enum UserRole {
