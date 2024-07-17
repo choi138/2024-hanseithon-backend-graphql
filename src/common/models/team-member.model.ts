@@ -1,6 +1,8 @@
-import { Field, Int, ObjectType, registerEnumType } from '@nestjs/graphql';
+import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 
 import { TeamMemberPosition } from '@prisma/client';
+
+import { UserModel } from './user.model';
 
 registerEnumType(TeamMemberPosition, { name: 'TeamMemberPosition' });
 
@@ -17,4 +19,7 @@ export class TeamMemberModel {
 
   @Field(() => TeamMemberPosition, { description: '팀 멤버 포지션' })
   position: TeamMemberPosition;
+
+  @Field(() => UserModel, { description: '팀 멤버 정보' })
+  user: UserModel;
 }

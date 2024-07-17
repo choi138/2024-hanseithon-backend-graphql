@@ -1,4 +1,6 @@
-import { InputType, IntersectionType } from '@nestjs/graphql';
+import { Field, InputType, IntersectionType, ObjectType } from '@nestjs/graphql';
+
+import { TeamModel } from 'src/common/models';
 
 import { CreateTeamMemberDto } from './create-team-member.dto';
 import { CreateTeamDto } from './create-team.dto';

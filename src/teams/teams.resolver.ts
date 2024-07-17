@@ -22,7 +22,7 @@ import { JwtAccessGuard } from 'src/auth/guards';
 import { TeamModel, UserModel } from 'src/common/models';
 import { PrismaService } from 'src/common/prisma';
 
-import { CreateTeamMemberDto } from './dto';
+import { CreateTeamAndJoinOutputDto, CreateTeamMemberDto, JoinTeamDto } from './dto';
 import { CreateTeamAndJoinDto } from './dto/create-team-and-join.dto';
 import { UpdateTeamPositionDto } from './dto/update-team-position.dto';
 import { TeamsService } from './teams.service';
@@ -41,7 +41,7 @@ export class TeamsResolver {
     return await this.teamsService.getAllTeams();
   }
 
-  @Mutation(() => TeamModel)
+  @Mutation(() => CreateTeamAndJoinOutputDto)
   @UseGuards(JwtAccessGuard)
   async createTeam(
     @GetUser() user: UserModel,
@@ -50,16 +50,11 @@ export class TeamsResolver {
     return this.teamsService.createTeamAndJoin(user, createTeamAndJoinDto);
   }
 
-  @Post('join/:inviteCode')
+  @Mutation(() => CreateTeamAndJoinOutputDto)
   @UseGuards(JwtAccessGuard)
-  @HttpCode(HttpStatus.OK)
-  async joinTeam(
-    @GetUser() user: UserModel,
-    @Param('inviteCode') inviteCode: string,
-    @Body() CreateTeamMemberDto: CreateTeamMemberDto,
-  ) {
+  async joinTeam(@GetUser() user: UserModel, @Args('joinTeamDto') joinTeamDto: JoinTeamDto) {
     const teamJoinEndTime = new Date(
-      this.configService.get<string>('TEAM_JOIN_END_TIME') ?? '2024-07-17 00:00:00',
+      this.configService.get<string>('TEAM_JOIN_END_TIME') ?? '2024-07-29 00:00:00',
     );
 
     if (new Date().getTime() > teamJoinEndTime.getTime())
@@ -67,7 +62,7 @@ export class TeamsResolver {
         '팀 참가는 07/18 23:59:59까지 가능해요. 참가 시간이 이미 지났어요',
       );
 
-    return await this.teamsService.joinTeam(user, inviteCode, CreateTeamMemberDto);
+    return await this.teamsService.joinTeam(user, joinTeamDto);
   }
 
   @Get('@me')

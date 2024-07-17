@@ -13,7 +13,7 @@ import { generateRandomString } from 'src/common/utils';
 // import { FilesService } from 'src/files/files.service';
 import { LogService } from 'src/log/log.service';
 
-import { CreateTeamDto, CreateTeamMemberDto } from './dto';
+import { CreateTeamDto, CreateTeamMemberDto, JoinTeamDto } from './dto';
 import { CreateTeamAndJoinDto } from './dto/create-team-and-join.dto';
 import { UpdateTeamPositionDto } from './dto/update-team-position.dto';
 
@@ -138,7 +138,7 @@ export class TeamsService {
     return await this.getTeamInfo(team.id);
   }
 
-  public async joinTeam(user: UserModel, inviteCode: string, { position }: CreateTeamMemberDto) {
+  public async joinTeam(user: UserModel, { position, inviteCode }: JoinTeamDto) {
     const { isExist: isUserHasTeam } = await this.isUserHasTeam(user.id);
     if (isUserHasTeam) throw new ConflictException('이미 소속중인 팀이 있어요');
 

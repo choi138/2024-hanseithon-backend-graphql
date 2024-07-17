@@ -28,7 +28,4 @@ export class TeamModel {
 
   @Field(() => String, { description: '초대 코드' })
   inviteCode: string;
-
-  @Field(() => [TeamMemberModel], { description: '팀 멤버' })
-  members: TeamMemberModel[];
 }
