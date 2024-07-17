@@ -1,30 +1,21 @@
-import {
-  BadRequestException,
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Param,
-  Patch,
-  Post,
-  UploadedFile,
-  UseGuards,
-  UseInterceptors,
-} from '@nestjs/common';
+import { BadRequestException, Get, UploadedFile, UseGuards } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { GetUser } from 'src/auth/decorators';
 import { JwtAccessGuard } from 'src/auth/guards';
-import { TeamModel, UserModel } from 'src/common/models';
+import { UserModel } from 'src/common/models';
 import { PrismaService } from 'src/common/prisma';
 
-import { CreateTeamAndJoinOutputDto, CreateTeamMemberDto, JoinTeamDto } from './dto';
-import { CreateTeamAndJoinDto } from './dto/create-team-and-join.dto';
-import { UpdateTeamPositionDto } from './dto/update-team-position.dto';
+import {
+  TeamOutputDto,
+  JoinTeamDto,
+  CreateTeamAndJoinDto,
+  UpdateTeamPositionDto,
+  TeamMemberOutputDto,
+  TeamLogsOutputDto,
+} from './dto';
 import { TeamsService } from './teams.service';
 
 @Resolver()
@@ -35,24 +26,27 @@ export class TeamsResolver {
     private readonly prismaService: PrismaService,
   ) {}
 
-  @Query(() => [TeamModel])
+  @Query(() => [TeamOutputDto])
   @UseGuards(JwtAccessGuard)
   async getTeams() {
     return await this.teamsService.getAllTeams();
   }
 
-  @Mutation(() => CreateTeamAndJoinOutputDto)
+  @Mutation(() => TeamOutputDto)
   @UseGuards(JwtAccessGuard)
   async createTeam(
     @GetUser() user: UserModel,
     @Args('createTeamAndJoinDto') createTeamAndJoinDto: CreateTeamAndJoinDto,
-  ) {
+  ): Promise<TeamOutputDto> {
     return this.teamsService.createTeamAndJoin(user, createTeamAndJoinDto);
   }
 
-  @Mutation(() => CreateTeamAndJoinOutputDto)
+  @Mutation(() => TeamOutputDto)
   @UseGuards(JwtAccessGuard)
-  async joinTeam(@GetUser() user: UserModel, @Args('joinTeamDto') joinTeamDto: JoinTeamDto) {
+  async joinTeam(
+    @GetUser() user: UserModel,
+    @Args('joinTeamDto') joinTeamDto: JoinTeamDto,
+  ): Promise<TeamOutputDto> {
     const teamJoinEndTime = new Date(
       this.configService.get<string>('TEAM_JOIN_END_TIME') ?? '2024-07-29 00:00:00',
     );
@@ -65,41 +59,41 @@ export class TeamsResolver {
     return await this.teamsService.joinTeam(user, joinTeamDto);
   }
 
-  @Get('@me')
+  @Query(() => TeamOutputDto)
   @UseGuards(JwtAccessGuard)
-  async getMyTeamInfo(@GetUser() user: UserModel) {
+  async getMyTeamInfo(@GetUser() user: UserModel): Promise<TeamOutputDto> {
     if (!user.teamMember) throw new BadRequestException('팀에 가입되어 있지 않아요.');
     return await this.teamsService.getTeamInfo(user.teamMember.teamId);
   }
 
-  @Delete('@me/leave')
+  @Mutation(() => Boolean)
   @UseGuards(JwtAccessGuard)
-  async leaveTeam(@GetUser() user: UserModel) {
+  async leaveTeam(@GetUser() user: UserModel): Promise<boolean> {
     return await this.teamsService.leaveTeam(user);
   }
 
-  @Delete('@me')
+  @Mutation(() => Boolean)
   @UseGuards(JwtAccessGuard)
-  async deleteTeam(@GetUser() user: UserModel) {
+  async deleteTeam(@GetUser() user: UserModel): Promise<boolean> {
     return await this.teamsService.deleteTeamByLeader(user);
   }
 
-  @Patch('@me/position')
+  @Mutation(() => Boolean)
   @UseGuards(JwtAccessGuard)
   async updateMemberPosition(
     @GetUser() user: UserModel,
-    @Body() updateTeamMemberPosition: UpdateTeamPositionDto,
-  ) {
+    @Args('updateTeamMemberPosition') updateTeamMemberPosition: UpdateTeamPositionDto,
+  ): Promise<boolean> {
     return await this.teamsService.updateMemberPosition(user.id, updateTeamMemberPosition);
   }
 
-  @Get('all/members')
+  @Query(() => [TeamMemberOutputDto])
   @UseGuards(JwtAccessGuard)
   async getAllTeamMembers() {
     return await this.teamsService.getAllMembersWithStudentProfile();
   }
 
-  @Get('@me/logs')
+  @Query(() => [TeamLogsOutputDto])
   @UseGuards(JwtAccessGuard)
   async getMyTeamLogs(@GetUser() user: UserModel) {
     return await this.teamsService.getMyTeamAllLogs(user.id);

@@ -1,4 +1,4 @@
-import { Field, InputType, IntersectionType, ObjectType } from '@nestjs/graphql';
+import { InputType, IntersectionType } from '@nestjs/graphql';
 
 import { TeamModel } from 'src/common/models';
 

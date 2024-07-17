@@ -96,35 +96,6 @@ enum UserRole {
   ADMIN
 }
 
-"""팀"""
-type TeamModel {
-  """팀 id"""
-  id: String!
-
-  """팀 생성일"""
-  createdAt: DateTime!
-
-  """팀 업데이트 시간"""
-  updatedAt: DateTime!
-
-  """팀 타입"""
-  type: TeamType!
-
-  """팀 이름"""
-  name: String!
-
-  """팀 설명"""
-  description: String!
-
-  """초대 코드"""
-  inviteCode: String!
-}
-
-enum TeamType {
-  LIVING
-  GAME
-}
-
 """로그인 성공 시 반환되는 Payload"""
 type AuthOutputDto {
   """JWT 인증 토큰"""
@@ -132,7 +103,7 @@ type AuthOutputDto {
 }
 
 """학생 정보 DTO"""
-type CreateTeamAndJoinStudentInfo {
+type TeamMemberStudentDto {
   """학과"""
   department: String!
 
@@ -141,7 +112,7 @@ type CreateTeamAndJoinStudentInfo {
 }
 
 """팀 멤버 DTO"""
-type CreateTeamAndJoinTeamMember {
+type TeamMemberDto {
   """팀장 여부"""
   isLeader: Boolean!
 
@@ -152,14 +123,14 @@ type CreateTeamAndJoinTeamMember {
   name: String!
 
   """학생 정보"""
-  student: CreateTeamAndJoinStudentInfo!
+  student: TeamMemberStudentDto!
 
   """팀 멤버 생성일"""
   createdAt: DateTime!
 }
 
-"""팀 생성 및 가입 결과 DTO"""
-type CreateTeamAndJoinOutputDto {
+"""팀 정보"""
+type TeamOutputDto {
   """팀 id"""
   id: String!
 
@@ -182,21 +153,77 @@ type CreateTeamAndJoinOutputDto {
   inviteCode: String!
 
   """팀 멤버"""
-  members: [CreateTeamAndJoinTeamMember!]!
+  members: [TeamMemberDto!]!
+}
+
+enum TeamType {
+  LIVING
+  GAME
+}
+
+"""팀 멤버 정보"""
+type TeamMemberOutputDto {
+  """포지션"""
+  position: TeamMemberPosition!
+
+  """이름"""
+  name: String!
+
+  """팀 멤버 생성일"""
+  createdAt: DateTime!
+
+  """학과"""
+  department: String!
+
+  """학년"""
+  grade: Float!
+
+  """팀 이름"""
+  teamName: String!
+}
+
+"""팀 로그 정보"""
+type TeamLogsOutputDto {
+  """로그 ID"""
+  id: String!
+
+  """로그 타입"""
+  type: TeamLogType!
+
+  """팀 ID"""
+  teamId: String!
+
+  """멤버 이름"""
+  memberName: String!
+
+  """로그 시간"""
+  actionAt: DateTime!
+}
+
+enum TeamLogType {
+  TEAM_CREATED
+  TEAM_JOIN
+  TEAM_LEFT
 }
 
 type Query {
   sayHello: String!
   me: UserModel!
-  getTeams: [TeamModel!]!
+  getTeams: [TeamOutputDto!]!
+  getMyTeamInfo: TeamOutputDto!
+  getAllTeamMembers: [TeamMemberOutputDto!]!
+  getMyTeamLogs: [TeamLogsOutputDto!]!
 }
 
 type Mutation {
   signUp(signUpDto: SignUpDto!): UserModel!
   signIn(signInDto: SignInDto!): AuthOutputDto!
   silent: AuthOutputDto!
-  createTeam(createTeamAndJoinDto: CreateTeamAndJoinDto!): CreateTeamAndJoinOutputDto!
-  joinTeam(joinTeamDto: JoinTeamDto!): CreateTeamAndJoinOutputDto!
+  createTeam(createTeamAndJoinDto: CreateTeamAndJoinDto!): TeamOutputDto!
+  joinTeam(joinTeamDto: JoinTeamDto!): TeamOutputDto!
+  leaveTeam: Boolean!
+  deleteTeam: Boolean!
+  updateMemberPosition(updateTeamMemberPosition: UpdateTeamPositionDto!): Boolean!
 }
 
 """회원가입 정보"""
@@ -260,4 +287,10 @@ input JoinTeamDto {
 
   """초대 코드"""
   inviteCode: String!
+}
+
+"""팀 포지션 변경 DTO"""
+input UpdateTeamPositionDto {
+  """팀 멤버 포지션"""
+  position: TeamMemberPosition!
 }

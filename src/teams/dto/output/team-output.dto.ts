@@ -7,7 +7,7 @@ import { TeamModel } from 'src/common/models';
 registerEnumType(TeamMemberPosition, { name: 'TeamMemberPosition' });
 
 @ObjectType({ description: '학생 정보 DTO' })
-export class CreateTeamAndJoinStudentInfo {
+export class TeamMemberStudentDto {
   @Field(() => String, { description: '학과' })
   department: string;
 
@@ -16,7 +16,7 @@ export class CreateTeamAndJoinStudentInfo {
 }
 
 @ObjectType({ description: '팀 멤버 DTO' })
-export class CreateTeamAndJoinTeamMember {
+export class TeamMemberDto {
   @Field(() => Boolean, { description: '팀장 여부' })
   isLeader: boolean;
 
@@ -26,15 +26,15 @@ export class CreateTeamAndJoinTeamMember {
   @Field(() => String, { description: '이름' })
   name: string;
 
-  @Field(() => CreateTeamAndJoinStudentInfo, { description: '학생 정보' })
-  student: CreateTeamAndJoinStudentInfo;
+  @Field(() => TeamMemberStudentDto, { description: '학생 정보' })
+  student: TeamMemberStudentDto;
 
   @Field(() => Date, { description: '팀 멤버 생성일' })
   createdAt: Date;
 }
 
-@ObjectType({ description: '팀 생성 및 가입 결과 DTO' })
-export class CreateTeamAndJoinOutputDto extends TeamModel {
-  @Field(() => [CreateTeamAndJoinTeamMember], { description: '팀 멤버' })
-  members: CreateTeamAndJoinTeamMember[];
+@ObjectType({ description: '팀 정보' })
+export class TeamOutputDto extends TeamModel {
+  @Field(() => [TeamMemberDto], { description: '팀 멤버' })
+  members: TeamMemberDto[];
 }

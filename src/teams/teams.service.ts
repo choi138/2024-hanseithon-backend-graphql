@@ -13,7 +13,7 @@ import { generateRandomString } from 'src/common/utils';
 // import { FilesService } from 'src/files/files.service';
 import { LogService } from 'src/log/log.service';
 
-import { CreateTeamDto, CreateTeamMemberDto, JoinTeamDto } from './dto';
+import { TeamOutputDto, CreateTeamDto, CreateTeamMemberDto, JoinTeamDto } from './dto';
 import { CreateTeamAndJoinDto } from './dto/create-team-and-join.dto';
 import { UpdateTeamPositionDto } from './dto/update-team-position.dto';
 
@@ -159,6 +159,7 @@ export class TeamsService {
   public async leaveTeam(user: UserModel, forceLeave?: boolean) {
     const { isExist, teamMember } = await this.isUserHasTeam(user.id);
     if (!isExist) throw new BadRequestException('팀에 가입되어 있지 않아요.');
+
     if (teamMember.isLeader && !forceLeave)
       throw new BadRequestException('팀장은 팀을 탈퇴할 수 없어요.');
 
@@ -167,7 +168,7 @@ export class TeamsService {
     if (!forceLeave)
       await this.logService.createTeamLog(TeamLogType.TEAM_LEFT, teamMember.teamId, user.name);
 
-    return;
+    return true;
   }
 
   public async deleteTeamByLeader(user: UserModel) {
@@ -179,13 +180,14 @@ export class TeamsService {
     await this.prismaService.teamMember.deleteMany({ where: { teamId: teamMember.teamId } });
 
     await this.prismaService.team.delete({ where: { id: teamMember.teamId } });
-    return;
+    return true;
   }
 
   public async updateMemberPosition(userId: string, { position }: UpdateTeamPositionDto) {
     const { isExist: isUserTeamExits, teamMember: userTeamMemeber } =
       await this.isUserHasTeam(userId);
     if (!isUserTeamExits) throw new BadRequestException('팀에 가입되어 있지 않아요.');
+
     const { isExist, teamMember } = await this.findTeamMember(userId, userTeamMemeber.teamId);
     if (!isExist) throw new BadRequestException('팀에 가입되어 있지 않아요.');
 
@@ -194,7 +196,7 @@ export class TeamsService {
       data: { position },
     });
 
-    return;
+    return true;
   }
 
   public async getAllMembersWithStudentProfile() {

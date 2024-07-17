@@ -43,7 +43,5 @@ export class UserModel {
   @Field(() => TeamMemberModel, { description: '팀 멤버 정보', nullable: true })
   teamMember?: TeamMemberModel;
 
-  //   student;
-  //   teamMember;
   //   files;
 }
