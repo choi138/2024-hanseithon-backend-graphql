@@ -1,4 +1,4 @@
-import { BadRequestException, Get, UploadedFile, UseGuards } from '@nestjs/common';
+import { BadRequestException, Get, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FileInterceptor } from '@nestjs/platform-express';
@@ -99,7 +99,9 @@ export class TeamsResolver {
     return await this.teamsService.getMyTeamAllLogs(user.id);
   }
 
-  // @Post('@me/upload')
+  // TODO: 시간되면 https://safnaj.medium.com/building-graphql-api-for-effortless-file-uploads-to-aws-s3-cf9ba8b5bd12 ㄱㄱ
+
+  // @Mutation(() => Boolean)
   // @UseGuards(JwtAccessGuard)
   // @UseInterceptors(FileInterceptor('file'))
   // async uploadFile(@GetUser() user: UserModel, @UploadedFile() uploadFile: Express.MulterS3.File) {
@@ -117,7 +119,7 @@ export class TeamsResolver {
   //   });
 
   //   await this.teamsService.appendFileToTeamUpload(user.teamMember.teamId, file);
-  //   return '';
+  //   return true;
   // }
 
   // @Get('@me/files/:fileId')
@@ -126,9 +128,9 @@ export class TeamsResolver {
   //   return await this.teamsService.downloadTeamFile(user, fileId);
   // }
 
-  @Get('@me/files')
-  @UseGuards(JwtAccessGuard)
-  async getMyTeamFiles(@GetUser() user: UserModel) {
-    return await this.teamsService.getMyTeamFiles(user.id);
-  }
+  // @Get('@me/files')
+  // @UseGuards(JwtAccessGuard)
+  // async getMyTeamFiles(@GetUser() user: UserModel) {
+  //   return await this.teamsService.getMyTeamFiles(user.id);
+  // }
 }
