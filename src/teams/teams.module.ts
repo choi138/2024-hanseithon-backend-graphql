@@ -13,7 +13,7 @@ import { UserModel } from 'src/common/models';
 import { PrismaModule } from 'src/common/prisma';
 import { LogModule } from 'src/log/log.module';
 
-import { TeamsController } from './teams.resolver';
+import { TeamsResolver } from './teams.resolver';
 import { TeamsService } from './teams.service';
 
 @Module({
@@ -66,7 +66,6 @@ import { TeamsService } from './teams.service';
       },
     }),
   ],
-  providers: [TeamsService],
-  controllers: [TeamsController],
+  providers: [TeamsService, TeamsResolver],
 })
 export class TeamsModule {}

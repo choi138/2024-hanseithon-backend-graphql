@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { FileInterceptor } from '@nestjs/platform-express';
 
 import { GetUser } from 'src/auth/decorators';
@@ -28,7 +28,7 @@ import { UpdateTeamPositionDto } from './dto/update-team-position.dto';
 import { TeamsService } from './teams.service';
 
 @Resolver()
-export class TeamsController {
+export class TeamsResolver {
   constructor(
     private readonly teamsService: TeamsService,
     private readonly configService: ConfigService,
@@ -43,8 +43,10 @@ export class TeamsController {
 
   @Mutation(() => TeamModel)
   @UseGuards(JwtAccessGuard)
-  @HttpCode(HttpStatus.CREATED)
-  async createTeam(@GetUser() user: UserModel, @Body() createTeamAndJoinDto: CreateTeamAndJoinDto) {
+  async createTeam(
+    @GetUser() user: UserModel,
+    @Args('createTeamAndJoinDto') createTeamAndJoinDto: CreateTeamAndJoinDto,
+  ) {
     return this.teamsService.createTeamAndJoin(user, createTeamAndJoinDto);
   }
 

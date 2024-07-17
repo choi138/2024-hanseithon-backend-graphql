@@ -93,6 +93,38 @@ enum UserRole {
   ADMIN
 }
 
+"""팀"""
+type TeamModel {
+  """팀 id"""
+  id: String!
+
+  """팀 생성일"""
+  createdAt: DateTime!
+
+  """팀 업데이트 시간"""
+  updatedAt: DateTime!
+
+  """팀 타입"""
+  type: TeamType!
+
+  """팀 이름"""
+  name: String!
+
+  """팀 설명"""
+  description: String!
+
+  """초대 코드"""
+  inviteCode: String!
+
+  """팀 멤버"""
+  members: [TeamMemberModel!]!
+}
+
+enum TeamType {
+  LIVING
+  GAME
+}
+
 """로그인 성공 시 반환되는 Payload"""
 type AuthOutputDto {
   """JWT 인증 토큰"""
@@ -102,12 +134,14 @@ type AuthOutputDto {
 type Query {
   sayHello: String!
   me: UserModel!
+  getTeams: [TeamModel!]!
 }
 
 type Mutation {
   signUp(signUpDto: SignUpDto!): UserModel!
   signIn(signInDto: SignInDto!): AuthOutputDto!
   silent: AuthOutputDto!
+  createTeam(createTeamAndJoinDto: CreateTeamAndJoinDto!): TeamModel!
 }
 
 """회원가입 정보"""
@@ -147,4 +181,19 @@ input SignInDto {
 
   """사용자 비밀번호"""
   password: String!
+}
+
+"""팀 생성 및 가입 DTO"""
+input CreateTeamAndJoinDto {
+  """팀명"""
+  name: String!
+
+  """팀 설명"""
+  description: String!
+
+  """팀 유형"""
+  type: TeamType!
+
+  """팀 멤버 포지션"""
+  position: TeamMemberPosition!
 }
