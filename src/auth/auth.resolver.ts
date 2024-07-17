@@ -63,6 +63,6 @@ export class AuthResolver {
   @Query(() => UserModel)
   @UseGuards(JwtAccessGuard)
   async me(@GetUser() user: UserModel): Promise<UserModel> {
-    return this.authService.formatUser(user);
+    return user;
   }
 }

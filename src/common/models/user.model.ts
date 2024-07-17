@@ -3,6 +3,7 @@ import { Field, ObjectType, registerEnumType } from '@nestjs/graphql';
 import { UserRole } from '@prisma/client';
 
 import { StudentModel } from './student.model';
+import { TeamMemberModel } from './team-member.model';
 
 registerEnumType(UserRole, { name: 'UserRole' });
 
@@ -38,6 +39,10 @@ export class UserModel {
 
   @Field(() => StudentModel, { description: '학생 정보' })
   student: StudentModel;
+
+  @Field(() => TeamMemberModel, { description: '팀 멤버 정보', nullable: true })
+  teamMember?: TeamMemberModel;
+
   //   student;
   //   teamMember;
   //   files;

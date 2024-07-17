@@ -25,7 +25,7 @@ export class UsersService {
 
   public async updateUser(
     id: UserModel['id'],
-    data: Partial<Omit<UserModel, 'id' | 'createdAt' | 'updatedAt' | 'student'>>, // 유저의 id, createdAt, updatedAt은 수정할 수 없도록 설정
+    data: Partial<Pick<UserModel, 'lastLoginIp' | 'lastLoginAt'>>,
   ) {
     return this.prismaService.user.update({ where: { id }, data });
   }

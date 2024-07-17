@@ -5,9 +5,7 @@ import { JwtService } from '@nestjs/jwt';
 import { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
-// import { StudentsService } from 'src/students/students.service';
-
-import { StudentModel, UserModel } from 'src/common/models';
+import { UserModel } from 'src/common/models';
 import { StudentsService } from 'src/students/students.service';
 import { UsersService } from 'src/users/users.service';
 
@@ -26,7 +24,7 @@ export class AuthService {
     this.bcryptNumber = 10;
   }
 
-  public async signUp({ email, password, name, student }: SignUpDto): Promise<UserModel> {
+  public async signUp({ email, password, name, student }: SignUpDto): Promise<any> {
     const { isExist: existUser } = await this.usersService.isExistUser(email);
     if (existUser) throw new ConflictException('이미 존재하는 유저입니다.');
 
@@ -95,19 +93,5 @@ export class AuthService {
     });
 
     return token;
-  }
-
-  public formatUser(user: UserModel) {
-    if (user.student) {
-      delete user.student.id;
-      delete user.student.userId;
-    }
-
-    // if (user.teamMember) {
-    //   delete user.teamMember.id;
-    //   delete user.teamMember.userId;
-    // }
-
-    return user;
   }
 }

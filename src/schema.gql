@@ -4,9 +4,6 @@
 
 """학생"""
 type StudentModel {
-  """학생 id"""
-  id: String!
-
   """학과"""
   department: StudentDepartment!
 
@@ -18,9 +15,6 @@ type StudentModel {
 
   """번호"""
   number: Float!
-
-  """학생 id"""
-  userId: String!
 }
 
 enum StudentDepartment {
@@ -29,6 +23,32 @@ enum StudentDepartment {
   HACKING
   NETWORK
   GAME
+}
+
+"""팀 멤버"""
+type TeamMemberModel {
+  """팀 멤버 생성일"""
+  createdAt: DateTime!
+
+  """팀 리더 여부"""
+  isLeader: Boolean!
+
+  """팀 아이디"""
+  teamId: String!
+
+  """팀 멤버 포지션"""
+  position: TeamMemberPosition!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+enum TeamMemberPosition {
+  PM
+  DESIGNER
+  DEVELOPER
 }
 
 """사용자"""
@@ -62,6 +82,9 @@ type UserModel {
 
   """학생 정보"""
   student: StudentModel!
+
+  """팀 멤버 정보"""
+  teamMember: TeamMemberModel
 }
 
 enum UserRole {
@@ -69,11 +92,6 @@ enum UserRole {
   STUDENT
   ADMIN
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 """로그인 성공 시 반환되는 Payload"""
 type AuthOutputDto {
