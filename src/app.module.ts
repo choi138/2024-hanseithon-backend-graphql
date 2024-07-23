@@ -5,7 +5,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 
-import { AppController } from './app.controller';
+import { AppResolver } from './app.resolver';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { StudentsModule } from './students/students.module';
@@ -43,7 +43,6 @@ import { UsersModule } from './users/users.module';
     StudentsModule,
     TeamsModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, AppResolver],
 })
 export class AppModule {}

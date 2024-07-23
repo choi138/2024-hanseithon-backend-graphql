@@ -207,6 +207,7 @@ enum TeamLogType {
 }
 
 type Query {
+  getHello: String!
   sayHello: String!
   me: UserModel!
   getTeams: [TeamOutputDto!]!
